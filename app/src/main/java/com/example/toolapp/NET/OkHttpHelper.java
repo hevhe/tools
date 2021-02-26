@@ -28,7 +28,7 @@ public class OkHttpHelper {
         }
 
     }
-    public void doGetAsyn(String url,String method, Callback callback)
+    public static void doGetAsyn(String url,String method, Callback callback)
     {
         OkHttpClient client=new OkHttpClient();
         Request request = new Request.Builder()
@@ -54,12 +54,13 @@ public class OkHttpHelper {
 
 
     }
-    public void doPostAsyn(String url, String method, String json, String appkey, Callback callback)
+    public static void doPostAsyn(String url, String method, String json, String appkey, Callback callback)
     {
         OkHttpClient client=new OkHttpClient();
         RequestBody requestBody=RequestBody.create(MediaType.parse("application/json"),json);
         Request request=new Request.Builder()
                 .url(url+method)
+                .addHeader("authorization","APP_KEYS "+appkey)
                 .post(requestBody)
                 .build();
         Call call=client.newCall(request);

@@ -4,13 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.alibaba.fastjson.JSONObject;
+import com.example.toolapp.BIZ.ErrorResponse;
 import com.example.toolapp.BIZ.LoginBiz;
 import com.example.toolapp.Enmu.AccountType;
 import com.example.toolapp.NET.OkHttpHelper;
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText userNameText;
     private EditText pwdText;
     private Dialog dialog;
+    private ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,44 +46,86 @@ public class MainActivity extends AppCompatActivity {
         warehouseText=findViewById(R.id.warehouseText);
         userNameText=findViewById(R.id.userNameText);
         pwdText=findViewById(R.id.pwdText);
-        SystemConfig.baseUrl="http://183.6.117.112:7889/api/";
+        SystemConfig.baseUrl="http://rfid.gxgglobal.cn/hdwapi/";
         loginBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                System.out.println("点击了登录按钮！");
                 loginMethod();
             }
         });
-
         loginBut.setFocusableInTouchMode(true);
     }
 
     public void loginMethod(){
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(SystemConfig.appkey);
-        builder.setMessage("正在登陆中!!!");
-        builder.setTitle("提示");
-        builder.setPositiveButton("确定", null);
-        builder.setNeutralButton("取消", null);
-        builder.setCancelable(false);
-        dialog=builder.show();
+        //setMessageDialog("提示","正在登录!!!");
         OkHttpHelper okHttpHelper=new OkHttpHelper();
         Gson gson=new Gson();
         LoginBiz biz=new LoginBiz(warehouseText.getText().toString(),"MID", AccountType.WAREHOUSE,userNameText.getText().toString(),pwdText.getText().toString(),"WAREHOUSE");
         okHttpHelper.doPostAsyn(SystemConfig.baseUrl, "/api/security/login", gson.toJson(biz), null, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                System.out.println("失败信息："+e.getMessage());
+                setMessageDialog("提示",e.getMessage());
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                SystemConfig.appkey=response.body().string().replace("\"","");
-                dialog.dismiss();
-                System.out.println(SystemConfig.appkey);
-            }
+                final String responseText=response.body().string();
+                if(response.code()==200){
+                    SystemConfig.appkey=responseText.replace("\"","");
+                    dialog.dismiss();
+                    System.out.println(SystemConfig.appkey);
+                    Intent intent=new Intent(MainActivity.this,MenuActivity.class);
+                    startActivity(intent);
+                }else{
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ErrorResponse errorResponse=new Gson().fromJson(responseText,ErrorResponse.class);
+                            setMessageDialog("提示",errorResponse.message);
+                        }
+                    });
+                    System.out.println(responseText);
+                }
+
+        }
         });
+    }
+
+    private void showProgressDialog(String mes){
+        if(progressDialog==null){
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setMessage(mes);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setCanceledOnTouchOutside(false);
+        }
+        progressDialog.show();
+    }
+
+    private void closeProgressDialog(){
+        if(progressDialog!=null){
+            progressDialog.dismiss();
+        }
+    }
+
+    private void setMessageDialog(String title,String mes){
+        dialog=null;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(mes);
+        builder.setTitle("提示");
+        builder.setPositiveButton("确定", null);
+        builder.setNeutralButton("取消", null);
+        builder.setCancelable(false);
+        dialog=builder.show();
+    }
+
+    private void closeMesDialog(){
+        if(dialog!=null){
+            dialog.dismiss();
+        }
     }
 
 
 }
+
+

@@ -1,9 +1,6 @@
 package com.example.toolapp.BIZ;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.example.toolapp.Enmu.AccountType;
-import com.google.gson.Gson;
 
 public class LoginBiz {
     private String warehouseCode;

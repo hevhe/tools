@@ -1,32 +1,34 @@
 package com.example.toolapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.example.toolapp.ApplyOrder.ApplyOrderReturn;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
+import android.widget.Button;
 
 public class MenuActivity extends AppCompatActivity {
 
+
+    private Button productionOrderBut;
+    private Button applyOrderBut;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.menu);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        productionOrderBut=this.findViewById(R.id.production_order_button);
+        applyOrderBut=this.findViewById(R.id.apply_order_button);
+        applyOrderBut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent=new Intent(MenuActivity.this, ApplyOrderReturn.class);
+                startActivity(intent);
             }
         });
     }
 
 }
+

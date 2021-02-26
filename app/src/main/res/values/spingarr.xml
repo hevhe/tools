@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="spingarr">
+        <item>款号</item>
+        <item>单号</item>
+        <item>来源单号</item>
+        <item>采购订单</item>
+    </string-array>
+</resources>
